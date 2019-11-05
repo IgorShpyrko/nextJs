@@ -1,17 +1,8 @@
 import React from 'react';
-import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 import App from 'next/app';
 import withRedux from 'next-redux-wrapper';
-
-const reducer = (state = {foo: ''}, action) => {
-  switch (action.type) {
-    case 'FOO':
-      return {...state, foo: action.payload};
-    default:
-      return state
-  }
-};
+import { makeStore } from '../store';
 
 /**
 * @param {object} initialState
@@ -21,10 +12,6 @@ const reducer = (state = {foo: ''}, action) => {
 * @param {boolean} options.debug User-defined debug mode param
 * @param {string} options.storeKey This key will be used to preserve store in global namespace for safe HMR 
 */
-
-const makeStore = (initialState, options) => {
-  return createStore(reducer, initialState);
-};
 
 interface IMyApp {
   store: any
