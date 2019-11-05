@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "My webpack project",
   "scripts": {
-    "dev": "node server.ts",
+    "dev": "node server/index.ts",
     "build": "next build",
     "start": "next start"
   },
