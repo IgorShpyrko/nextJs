@@ -1,13 +1,10 @@
 import React from 'react';
-import Link from 'next/link';
+import AppContainer from '../containers/App';
 
 const Index = () => (
-  <div>
-    <Link href="/about">
-      <a title="about">About</a>
-    </Link>
-    <p>Hello Next.js</p>
-  </div>
+  <main>
+    <AppContainer />
+  </main>
 );
 
 export default Index;
