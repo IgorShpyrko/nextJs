@@ -1,13 +1,13 @@
 import React from 'react';
-import AboutContainer from '../containers/About';
+import MapContainer from '../containers/Map';
 import Section from '../layouts/Section';
 
-const About = () => {
+const MapPage = () => {
   return (
     <Section>
-      <AboutContainer />
+      <MapContainer />
     </Section>
   );
 };
 
-export default About;
+export default MapPage;

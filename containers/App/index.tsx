@@ -8,6 +8,9 @@ const AppContainer = () => {
       <Link href="/about">
         <a title="about">About</a>
       </Link>
+      <Link href="/map">
+        <a title="map">Map</a>
+      </Link>
       <p>Hello Next.js</p>
     </>
   );
