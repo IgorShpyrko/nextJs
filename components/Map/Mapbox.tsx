@@ -8,6 +8,5 @@ const openMapTiles = {
 
 export default ReactMapboxGl({
   apiUrl: `${openMapTiles.apiUrl}/?key=${openMapTiles.accessToken}`,
-  accessToken: 'pk.eyJ1Ijoicm9vbXN0ZXIiLCJhIjoiY2phbG5xbmU1MnQ5eTJxcGxldDU0dmJ4NiJ9.1GHso01jofvmWImm0_Nmow',
-  interactive: false
+  accessToken: 'pk.eyJ1Ijoicm9vbXN0ZXIiLCJhIjoiY2phbG5xbmU1MnQ5eTJxcGxldDU0dmJ4NiJ9.1GHso01jofvmWImm0_Nmow'
 });

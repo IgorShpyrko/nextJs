@@ -2,10 +2,10 @@ import React, { useRef, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { Marker, Cluster, ZoomControl } from "react-mapbox-gl";
 
-// @ts-ignore:
+// @ts-ignore
 const TilesMap = dynamic(() => import('./Mapbox'), {
+  loading: () => <div>loading...</div>,
   ssr: false,
-  loading: () => <div>loading...</div>
 });
 
 const Map = () => {
