@@ -27,6 +27,10 @@ const AboutContainer = () => {
       <Link href="/">
         <a title="home">Home</a>
       </Link>
+      <br />
+      <Link href="/map">
+        <a title="map">Map</a>
+      </Link>
       <p>About</p>
       <CustomInput
         ref={inputRef}

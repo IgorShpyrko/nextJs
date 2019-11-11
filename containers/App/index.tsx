@@ -8,6 +8,7 @@ const AppContainer = () => {
       <Link href="/about">
         <a title="about">About</a>
       </Link>
+      <br />
       <Link href="/map">
         <a title="map">Map</a>
       </Link>
