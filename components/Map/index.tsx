@@ -1,21 +1,40 @@
 import React, { useRef, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { Marker, Cluster, ZoomControl } from "react-mapbox-gl";
+
+import mapService from '../../services/maps';
 
 // @ts-ignore
-const TilesMap = dynamic(() => import('./Mapbox'), {
+const TilesMap: React.ComponentType<{style}> = dynamic(() => import('./Mapbox').then(mod => mod.default), {
+  loading: () => <div>loading...</div>,
+  ssr: false,
+});
+
+// @ts-ignore
+const Marker: React.ComponentType<{style, coordinates, key?}> = dynamic(() => import('./Mapbox').then(mod => mod.Marker), {
+  loading: () => <div>loading...</div>,
+  ssr: false,
+});
+
+const Cluster: React.ComponentType<any> = dynamic(() => import('./Mapbox').then(mod => mod.Cluster), {
+  loading: () => <div>loading...</div>,
+  ssr: false,
+});
+
+const ZoomControl: React.ComponentType<{position, className}> = dynamic(() => import('./Mapbox').then(mod => mod.ZoomControl), {
   loading: () => <div>loading...</div>,
   ssr: false,
 });
 
 const Map = () => {
   const featuresRef = useRef(null);
-  const mapRef = useRef(null);
+  const mapStylesRef = useRef(null);
   useEffect(
     () => {
-      if (window && mapRef.current === 'undefined') {
-        mapRef.current = TilesMap;
-      }
+      mapService.getStyles()
+        .then(data => {
+          console.log('data :', data);
+          mapStylesRef.current = data.data
+        })
     },
     []
   );
@@ -26,9 +45,11 @@ const Map = () => {
     </Marker>
   );
 
+  if (!mapStylesRef.current || mapStylesRef.current === null) return null;
+
   return (
     <div style={{width: '300px', height: '300px'}}>
-      <TilesMap style='https://map.roomster.com/styles/osm-bright/style.json?key=oxQ5YeTFJ13jkTv9eIN9pB67cKSSFhsV'>
+      <TilesMap style={mapStylesRef.current}>
         <ZoomControl position="bottom-right" className="map-tiles-zoom-control" />
         <Cluster ClusterMarkerFactory={clusterMarker}>
           {
