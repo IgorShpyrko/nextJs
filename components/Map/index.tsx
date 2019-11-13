@@ -1,10 +1,11 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
+import useStyles from './styles';
 
 import mapService from '../../services/maps';
 
 // @ts-ignore
-const TilesMap: React.ComponentType<{style}> = dynamic(() => import('./Mapbox').then(mod => mod.default), {
+const TilesMap: React.ComponentType<{style, className}> = dynamic(() => import('./Mapbox').then(mod => mod.default), {
   loading: () => <div>loading...</div>,
   ssr: false,
 });
@@ -26,14 +27,22 @@ const ZoomControl: React.ComponentType<{position, className}> = dynamic(() => im
 });
 
 const Map = () => {
-  const featuresRef = useRef(null);
+  const classes = useStyles({});
   const mapStylesRef = useRef(null);
+  const [, setTmp] = useState(0);
+
+  const forseUpdate = () => {
+    setTmp(i => i + 1);
+  };
+
   useEffect(
     () => {
       mapService.getStyles()
         .then(data => {
-          console.log('data :', data);
-          mapStylesRef.current = data.data
+          if (!mapStylesRef.current || mapStylesRef.current === null) {
+            mapStylesRef.current = data;
+            forseUpdate();
+          }
         })
     },
     []
@@ -47,12 +56,15 @@ const Map = () => {
 
   if (!mapStylesRef.current || mapStylesRef.current === null) return null;
 
+  
   return (
-    <div style={{width: '300px', height: '300px'}}>
-      <TilesMap style={mapStylesRef.current}>
+    <div id="container" style={{width: '300px', height: '300px'}}>
+      <TilesMap
+        className={classes.root}
+        style={mapStylesRef.current.data}>
         <ZoomControl position="bottom-right" className="map-tiles-zoom-control" />
-        <Cluster ClusterMarkerFactory={clusterMarker}>
-          {
+        {/* <Cluster ClusterMarkerFactory={clusterMarker}> */}
+          {/* {
             featuresRef
             && featuresRef !== null
             && featuresRef.current
@@ -68,8 +80,8 @@ const Map = () => {
                 <div>M</div>
               </Marker>
             )
-          }
-        </Cluster>
+          } */}
+        {/* </Cluster> */}
       </TilesMap>
     </div>
   )
