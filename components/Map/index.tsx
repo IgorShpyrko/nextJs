@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import useStyles from './styles';
-import { Map as ReactMapboxGlMap } from 'react-mapbox-gl';
+import { Map as ReactMapboxGlMap, Marker as ReactMapboxGlMarker} from 'react-mapbox-gl';
 
 import mapService, { Sort, ServiceType } from '../../services/maps';
 
@@ -12,7 +12,7 @@ const TilesMap: ReactMapboxGlMap = dynamic(() => import('./Mapbox').then(mod => 
 });
 
 // @ts-ignore
-const Marker: React.ComponentType<{style, coordinates, key?}> = dynamic(() => import('./Mapbox').then(mod => mod.Marker), {
+const Marker: ReactMapboxGlMarker = dynamic(() => import('./Mapbox').then(mod => mod.Marker), {
   loading: () => <div>loading...</div>,
   ssr: false,
 });
@@ -79,26 +79,35 @@ const Map = () => {
     []
   )
 
+  const clusterClick = (coordinates, pointCount, getLeaves) => {
+    console.log('coordinates :', coordinates);
+    console.log('pointCount :', pointCount);
+    console.log('getLeaves :', getLeaves);
+  }
+
   const clusterMarker = (
     coordinates: GeoJSON.Position,
-    // pointCount: number,
+    pointCount: number,
     getLeaves: (
       limit?: number,
       offset?: number
     ) => Array<React.ReactElement<any>>
   ) => {
-    console.log('coordinates :', coordinates);
     return (
       <Marker
         key={coordinates.toString()}
         coordinates={coordinates}
         style={{ zIndex: 9, width: '20px', height: '20px', backgroundColor: '#F00'}}
-        // onClick={this.clusterClick.bind(this, coordinates, pointCount, getLeaves)}
+        onClick={() => clusterClick(coordinates, pointCount, getLeaves)}
       >
         <div>{'pointCount'}</div>
       </Marker>
     )
   };
+
+  const onMarkerClick = (coordinates) => {
+    console.log('coordinates :', coordinates);
+  }
 
   if (!mapStylesRef.current || mapStylesRef.current === null) return null;
   if (!mapMarkersRef.current || mapMarkersRef.current === null) return null;
@@ -120,8 +129,8 @@ const Map = () => {
               <Marker
                 key={key}
                 style={{ zIndex: 9, width: '20px', height: '20px', backgroundColor: '#F00'}}
-                coordinates={{lat: feature.listing.geo_location.lat, lng: feature.listing.geo_location.lng}}
-                // onClick={onMarkerClick(feature.geometry.coordinates)}
+                coordinates={[feature.listing.geo_location.lng, feature.listing.geo_location.lat]}
+                onClick={() => onMarkerClick([feature.listing.geo_location.lng, feature.listing.geo_location.lat])}
               >
                 <div>M</div>
               </Marker>
