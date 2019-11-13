@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import useStyles from './styles';
 
-import mapService from '../../services/maps';
+import mapService, { Sort, ServiceType } from '../../services/maps';
 
 // @ts-ignore
 const TilesMap: React.ComponentType<{style, className}> = dynamic(() => import('./Mapbox').then(mod => mod.default), {
@@ -29,6 +29,7 @@ const ZoomControl: React.ComponentType<{position, className}> = dynamic(() => im
 const Map = () => {
   const classes = useStyles({});
   const mapStylesRef = useRef(null);
+  const mapMarkersRef = useRef(null);
   const [, setTmp] = useState(0);
 
   const forseUpdate = () => {
@@ -47,6 +48,29 @@ const Map = () => {
     },
     []
   );
+
+ 
+
+  useEffect(
+    () => {
+       // Hardcoded for now
+      const search_params = {
+        page_number: 1,
+        service_type: ServiceType.haveShare,
+        sort: Sort.lastActivity,
+        age: {
+          min: 18,
+        }
+      }
+
+      mapService.getMarkers({search_params})
+        .then(data => {
+          mapMarkersRef.current = data;
+          forseUpdate();
+        })
+    },
+    [{/* listen to map location change*/}]
+  )
 
   const clusterMarker = (coordinates) => (
     <Marker coordinates={coordinates} style={{ zIndex: 9 }}>
