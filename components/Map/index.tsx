@@ -1,11 +1,12 @@
 import React, { useRef, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import useStyles from './styles';
+import { Map as ReactMapboxGlMap } from 'react-mapbox-gl';
 
 import mapService, { Sort, ServiceType } from '../../services/maps';
 
 // @ts-ignore
-const TilesMap: React.ComponentType<{style, className}> = dynamic(() => import('./Mapbox').then(mod => mod.default), {
+const TilesMap: ReactMapboxGlMap = dynamic(() => import('./Mapbox').then(mod => mod.default), {
   loading: () => <div>loading...</div>,
   ssr: false,
 });
@@ -78,28 +79,38 @@ const Map = () => {
     []
   )
 
-  const clusterMarker = (coordinates) => {
+  const clusterMarker = (
+    coordinates: GeoJSON.Position,
+    // pointCount: number,
+    getLeaves: (
+      limit?: number,
+      offset?: number
+    ) => Array<React.ReactElement<any>>
+  ) => {
     console.log('coordinates :', coordinates);
-
     return (
-        <Marker
-          style={{ zIndex: 9 }}
-          coordinates={coordinates}
-          // onClick={onMarkerClick(feature.geometry.coordinates)}
-        >
-          <div>M</div>
-        </Marker>
+      <Marker
+        key={coordinates.toString()}
+        coordinates={coordinates}
+        style={{ zIndex: 9, width: '20px', height: '20px', backgroundColor: '#F00'}}
+        // onClick={this.clusterClick.bind(this, coordinates, pointCount, getLeaves)}
+      >
+        <div>{'pointCount'}</div>
+      </Marker>
     )
   };
 
   if (!mapStylesRef.current || mapStylesRef.current === null) return null;
+  if (!mapMarkersRef.current || mapMarkersRef.current === null) return null;
 
   console.log('mapMarkersRef.current :', mapMarkersRef.current);
   return (
     <div id="container" style={{width: '300px', height: '300px'}}>
       <TilesMap
         className={classes.root}
-        style={mapStylesRef.current.data}>
+        style={mapStylesRef.current.data}
+        zoom={[3]}
+        >
         <ZoomControl position="bottom-right" className="map-tiles-zoom-control" />
         <Cluster ClusterMarkerFactory={clusterMarker} radius={32}>
           {
@@ -108,7 +119,7 @@ const Map = () => {
             mapMarkersRef.current.data.items.map((feature, key) =>
               <Marker
                 key={key}
-                style={{ zIndex: 9 }}
+                style={{ zIndex: 9, width: '20px', height: '20px', backgroundColor: '#F00'}}
                 coordinates={{lat: feature.listing.geo_location.lat, lng: feature.listing.geo_location.lng}}
                 // onClick={onMarkerClick(feature.geometry.coordinates)}
               >
