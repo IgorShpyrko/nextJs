@@ -32,19 +32,21 @@ const Map = () => {
   const mapMarkersRef = useRef(null);
   const [, setTmp] = useState(0);
 
-  const forseUpdate = () => {
+  const forceUpdate = () => {
     setTmp(i => i + 1);
   };
 
   useEffect(
     () => {
-      mapService.getStyles()
-        .then(data => {
-          if (!mapStylesRef.current || mapStylesRef.current === null) {
-            mapStylesRef.current = data;
-            forseUpdate();
-          }
-        })
+      if (!mapStylesRef.current || mapStylesRef.current === null) {
+        mapService.getStyles()
+          .then(data => {
+            if (!mapStylesRef.current || mapStylesRef.current === null) {
+              mapStylesRef.current = data;
+              forceUpdate();
+            }
+          })
+      }
     },
     []
   );
@@ -60,52 +62,78 @@ const Map = () => {
         sort: Sort.lastActivity,
         age: {
           min: 18,
-        }
+        },
+        page_size: 50
       }
+      if (!mapMarkersRef.current || mapMarkersRef.current === null) {
+      console.log('fetch markers')
+        mapService.getMarkers({search_params})
+          .then(data => {
+            mapMarkersRef.current = data;
+            forceUpdate();
+          })
 
-      mapService.getMarkers({search_params})
-        .then(data => {
-          mapMarkersRef.current = data;
-          forseUpdate();
-        })
+      }
     },
-    [{/* listen to map location change*/}]
+    []
   )
 
-  const clusterMarker = (coordinates) => (
-    <Marker coordinates={coordinates} style={{ zIndex: 9 }}>
-      <div>C</div>
-    </Marker>
-  );
+  const clusterMarker = (coordinates) => {
+    console.log('coordinates :', coordinates);
+
+    return (
+        <Marker
+          style={{ zIndex: 9 }}
+          coordinates={coordinates}
+          // onClick={onMarkerClick(feature.geometry.coordinates)}
+        >
+          <div>M</div>
+        </Marker>
+    )
+  };
 
   if (!mapStylesRef.current || mapStylesRef.current === null) return null;
 
-  
+  console.log('mapMarkersRef.current :', mapMarkersRef.current);
   return (
     <div id="container" style={{width: '300px', height: '300px'}}>
       <TilesMap
         className={classes.root}
         style={mapStylesRef.current.data}>
         <ZoomControl position="bottom-right" className="map-tiles-zoom-control" />
-        {/* <Cluster ClusterMarkerFactory={clusterMarker}> */}
-          {/* {
-            featuresRef
-            && featuresRef !== null
-            && featuresRef.current
-            && featuresRef.current !== 'undefined'
-            && Array.isArray(featuresRef.current)
-            && featuresRef.current.map((feature, key) =>
+        <Cluster ClusterMarkerFactory={clusterMarker} radius={32}>
+          {
+            mapMarkersRef.current && 
+            mapMarkersRef.current.data && 
+            mapMarkersRef.current.data.items.map((feature, key) =>
               <Marker
                 key={key}
                 style={{ zIndex: 9 }}
-                coordinates={feature.geometry.coordinates}
+                coordinates={{lat: feature.listing.geo_location.lat, lng: feature.listing.geo_location.lng}}
                 // onClick={onMarkerClick(feature.geometry.coordinates)}
               >
                 <div>M</div>
               </Marker>
             )
-          } */}
-        {/* </Cluster> */}
+          }
+        </Cluster>
+        {/* {
+          mapMarkersRef.current && 
+          mapMarkersRef.current.data && 
+          mapMarkersRef.current.data.items.map((feature, key) => {
+            console.log('feature.listing.geo_location :', feature.listing.geo_location);
+            return (
+              <Marker
+                key={key}
+                style={{ zIndex: 9, width: '20px', height: '20px', backgroundColor: '#F00'}}
+                coordinates={{lat: feature.listing.geo_location.lat, lng: feature.listing.geo_location.lng}}
+                // onClick={onMarkerClick(feature.geometry.coordinates)}
+              >
+                <div>M</div>
+              </Marker>
+            )
+          })
+        } */}
       </TilesMap>
     </div>
   )
